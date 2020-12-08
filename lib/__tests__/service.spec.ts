@@ -78,7 +78,7 @@ describe('service', () => {
             expect(executionContext.switchToHttp().getResponse().header).not.toHaveBeenCalled();
         });
 
-        it('should use response.set if defined and response.set is not (Fastify)', async () => {
+        it('should use response.header if defined and response.set is not (Fastify)', async () => {
             executionContext = fakeExecutionContext(undefined, { header: jest.fn() }) as any;
             await rateLimiterService.executeRateLimiter(executionContext);
             expect(executionContext.switchToHttp().getResponse().header).toHaveBeenCalled();
@@ -117,29 +117,48 @@ describe('service', () => {
             );
         });
 
+        it('should use keyGenerator option to generate key if specified', async () => {
+            const mockOptions = {
+                keyGenerator: (request: any) => request.accountId,
+            };
+            reflector.get = jest.fn(() => mockOptions) as any;
+            executionContext = fakeExecutionContext({ accountId: 'account-id' }) as any;
+            const consumeMock = jest.fn(() => ({ msBeforeNext: 1000 }));
+            rateLimiterService.getRateLimiter = jest.fn(() => ({
+                consume: consumeMock,
+            })) as any;
+            await rateLimiterService.executeRateLimiter(executionContext);
+            expect(consumeMock).toHaveBeenCalledWith('account-id', expect.anything());
+        });
+
         it('should set headers', async () => {
             executionContext = fakeExecutionContext(undefined, { header: jest.fn() }) as any;
             await rateLimiterService.executeRateLimiter(executionContext);
-            expect(executionContext.switchToHttp().getResponse().set).toHaveBeenNthCalledWith(
-                1,
+            expect(executionContext.switchToHttp().getResponse().header).toHaveBeenCalledTimes(4);
+            expect(executionContext.switchToHttp().getResponse().header).toHaveBeenCalledWith(
                 'Retry-After',
                 expect.anything(),
             );
-            expect(executionContext.switchToHttp().getResponse().set).toHaveBeenNthCalledWith(
-                2,
+            expect(executionContext.switchToHttp().getResponse().header).toHaveBeenCalledWith(
                 'X-RateLimit-Limit',
                 expect.anything(),
             );
-            expect(executionContext.switchToHttp().getResponse().set).toHaveBeenNthCalledWith(
-                3,
+            expect(executionContext.switchToHttp().getResponse().header).toHaveBeenCalledWith(
                 'X-Retry-Remaining',
                 undefined,
             );
-            expect(executionContext.switchToHttp().getResponse().set).toHaveBeenNthCalledWith(
-                4,
+            expect(executionContext.switchToHttp().getResponse().header).toHaveBeenCalledWith(
                 'X-Retry-Reset',
                 expect.anything(),
             );
+        });
+
+        it('should not set headers if headers option is false', async () => {
+            const mockOptions = { headers: false };
+            reflector.get = jest.fn(() => mockOptions) as any;
+            executionContext = fakeExecutionContext(undefined, { header: jest.fn() }) as any;
+            await rateLimiterService.executeRateLimiter(executionContext);
+            expect(executionContext.switchToHttp().getResponse().header).not.toHaveBeenCalled();
         });
 
         it('should throw TooManyRequests exception if rate limit exceeded', async () => {

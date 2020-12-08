@@ -268,6 +268,17 @@ By default, if you don't set this up, the underlying library will use a `keyPref
 For instance if you have the decorator on a controller, the `keyPrefix` will be the controllers name. If used on a
 route, it will be a combination of the controllers name and the route functions name.
 
+### headers: boolean
+
+If true (the default), the rate limiter will send response headers: `Retry-After`, `X-RateLimit-Limit`,
+`X-Retry-Remaining`, and `X-Retry-Reset`.
+
+### keyGenerator: (request: any) => string
+
+This defines how the rate limiter will extract the unique key for each request. The default implementation
+uses `request.user.id` if `request.user` is present, otherwise it uses `request.ip`. This can be overridden
+if users are uniquely identified in some other manner on the request object.
+
 ## Examples
 
 ### With Redis

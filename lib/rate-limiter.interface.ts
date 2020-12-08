@@ -8,6 +8,8 @@ export type RateLimiterType = 'Redis' | 'Memcache' | 'Postgres' | 'MySQL' | 'Mem
 export interface RateLimiterModuleOptions extends Partial<IRateLimiterMongoOptions> {
     type?: RateLimiterType;
     pointsConsumed?: number;
+    headers?: boolean;
+    keyGenerator?: (req: any) => string;
 }
 
 export interface RateLimiterOptionsFactory {
