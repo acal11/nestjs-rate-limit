@@ -97,7 +97,7 @@ describe('service', () => {
 
         it('should use request.user.id as key if defined', async () => {
             executionContext = fakeExecutionContext({ user: { id: 'userId' } }) as any;
-            const consumeMock = jest.fn(() => ({ msBeforeNext: 1000 }));
+            const consumeMock = jest.fn((param1: any, param2: any) => ({ msBeforeNext: 1000 }));
             rateLimiterService.getRateLimiter = jest.fn(() => ({
                 consume: consumeMock,
             })) as any;
@@ -106,7 +106,7 @@ describe('service', () => {
         });
 
         it('should use ip as key if request.user.id is not defined', async () => {
-            const consumeMock = jest.fn(() => ({ msBeforeNext: 1000 }));
+            const consumeMock = jest.fn((param1: any, param2: any) => ({ msBeforeNext: 1000 }));
             rateLimiterService.getRateLimiter = jest.fn(() => ({
                 consume: consumeMock,
             })) as any;
@@ -123,7 +123,7 @@ describe('service', () => {
             };
             reflector.get = jest.fn(() => mockOptions) as any;
             executionContext = fakeExecutionContext({ accountId: 'account-id' }) as any;
-            const consumeMock = jest.fn(() => ({ msBeforeNext: 1000 }));
+            const consumeMock = jest.fn((param1: any, param2: any) => ({ msBeforeNext: 1000 }));
             rateLimiterService.getRateLimiter = jest.fn(() => ({
                 consume: consumeMock,
             })) as any;
