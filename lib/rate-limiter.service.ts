@@ -14,6 +14,7 @@ import { Reflector } from '@nestjs/core';
 
 import { RATE_LIMITER_OPTIONS, RATE_LIMITER_TOKEN, REFLECTOR } from './rate-limiter.constants';
 import { RateLimiterModuleOptions } from './rate-limiter.interface';
+import { defaultRateLimiterOptions } from './default-options';
 
 @Injectable()
 export class RateLimiterService {
@@ -22,7 +23,9 @@ export class RateLimiterService {
     constructor(
         @Inject(RATE_LIMITER_OPTIONS) private readonly options: RateLimiterModuleOptions,
         @Inject(REFLECTOR) private readonly reflector: Reflector,
-    ) {}
+    ) {
+        this.options = { ...defaultRateLimiterOptions, ...this.options };
+    }
 
     async getRateLimiter(keyPrefix: string, options?: RateLimiterModuleOptions): Promise<RateLimiterMemory> {
         let rateLimiter: RateLimiterMemory = this.rateLimiters.get(keyPrefix);

@@ -6,7 +6,7 @@ import { defaultRateLimiterOptions } from './default-options';
 
 @Module({})
 export class RateLimiterModule {
-    public static forRoot(options: RateLimiterModuleOptions = defaultRateLimiterOptions): DynamicModule {
+    public static forRoot(options: RateLimiterModuleOptions): DynamicModule {
         return {
             module: RateLimiterModule,
             imports: [RateLimiterCoreModule.forRoot(options)],
